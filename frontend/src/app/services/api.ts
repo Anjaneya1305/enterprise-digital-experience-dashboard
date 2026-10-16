@@ -1,3 +1,4 @@
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
@@ -56,59 +57,75 @@ export interface PerformanceTrend {
 export class ApiService {
   private readonly http = inject(HttpClient);
 
+  private readonly apiBaseUrl =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+      ? 'https://enterprise-digital-experience-dashboard.onrender.com'
+      : '';
+
   getLiveness(): Observable<HealthResult> {
     const start = performance.now();
 
-    return this.http.get<HealthResponse>('/api/v1/health/live').pipe(
-      map((data) => ({
-        data,
-        responseTime: Math.round(performance.now() - start),
-      })),
-    );
+    return this.http
+      .get<HealthResponse>(`${this.apiBaseUrl}/api/v1/health/live`)
+      .pipe(
+        map((data) => ({
+          data,
+          responseTime: Math.round(performance.now() - start),
+        })),
+      );
   }
 
   getReadiness(): Observable<HealthResult> {
     const start = performance.now();
 
-    return this.http.get<HealthResponse>('/api/v1/health/ready').pipe(
-      map((data) => ({
-        data,
-        responseTime: Math.round(performance.now() - start),
-      })),
-    );
+    return this.http
+      .get<HealthResponse>(`${this.apiBaseUrl}/api/v1/health/ready`)
+      .pipe(
+        map((data) => ({
+          data,
+          responseTime: Math.round(performance.now() - start),
+        })),
+      );
   }
 
   getMetrics(): Observable<MetricsResponse> {
-    return this.http.get<MetricsResponse>('/api/v1/metrics');
+    return this.http.get<MetricsResponse>(
+      `${this.apiBaseUrl}/api/v1/metrics`,
+    );
   }
 
   getEndpointAnalytics(): Observable<EndpointAnalytics[]> {
     return this.http.get<EndpointAnalytics[]>(
-      '/api/v1/metrics/analytics/endpoints',
+      `${this.apiBaseUrl}/api/v1/metrics/analytics/endpoints`,
     );
   }
 
   getPerformanceTrends(hours = 24): Observable<PerformanceTrend[]> {
     return this.http.get<PerformanceTrend[]>(
-      `/api/v1/metrics/analytics/trends?hours=${hours}`,
+      `${this.apiBaseUrl}/api/v1/metrics/analytics/trends?hours=${hours}`,
     );
   }
 
   getRecentErrors(limit = 10): Observable<ApiRequestMetric[]> {
     return this.http.get<ApiRequestMetric[]>(
-      `/api/v1/metrics/analytics/errors?limit=${limit}`,
+      `${this.apiBaseUrl}/api/v1/metrics/analytics/errors?limit=${limit}`,
     );
   }
 
-  getSlowRequests(thresholdMs = 200, limit = 10): Observable<ApiRequestMetric[]> {
+  getSlowRequests(
+    thresholdMs = 200,
+    limit = 10,
+  ): Observable<ApiRequestMetric[]> {
     return this.http.get<ApiRequestMetric[]>(
-      `/api/v1/metrics/analytics/slow-requests?thresholdMs=${thresholdMs}&limit=${limit}`,
+      `${this.apiBaseUrl}/api/v1/metrics/analytics/slow-requests?thresholdMs=${thresholdMs}&limit=${limit}`,
     );
   }
 
   getRequestHistory(limit = 20): Observable<ApiRequestMetric[]> {
     return this.http.get<ApiRequestMetric[]>(
-      `/api/v1/metrics/history?limit=${limit}`,
+      `${this.apiBaseUrl}/api/v1/metrics/history?limit=${limit}`,
     );
   }
 }
