@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode } from '@nestjs/common';
 
-@Controller('api/v1/health')
+@Controller('health')
 export class HealthController {
   @Get('live')
   @HttpCode(200)
@@ -10,6 +10,7 @@ export class HealthController {
       check: 'live',
       service: 'enterprise-dashboard-api',
       timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
     };
   }
 
@@ -21,6 +22,7 @@ export class HealthController {
       check: 'ready',
       service: 'enterprise-dashboard-api',
       timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
     };
   }
 }
